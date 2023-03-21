@@ -1,0 +1,25 @@
+uvicorn
+pydantic
+# pymongo
+requests
+fastapi
+aiokafka
+loguru
+pytest
+pytest-cov
+pytest-asyncio
+motor
+pydantic[email]
+python-dotenv
+web3
+alembic
+click
+h11
+Mako
+MarkupSafe
+psycopg2-binary
+python-dateutil
+python-editor
+six
+SQLAlchemy
+starlette
