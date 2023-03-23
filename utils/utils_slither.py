@@ -11,6 +11,11 @@ def getStorageLayout(contractAddress: str) -> dict:
         return storageLayout
 
 
+def getTopLevelType(type_to: str) -> str:
+
+    return type_to.split("_")[1].split("(")[0]
+
+
 def getVariableInfo(
     storageLayout: dict, var_log_name: str
 ) -> Tuple[int, int, int, str]:
@@ -27,6 +32,41 @@ def getVariableInfo(
                 return int_slot, size, offset, type_to, className
 
     return 0, 0, 0, "", ""
+
+
+def findArraySlot(
+    storageLayout: dict,
+    typeName: str,
+    key: int,
+    deep_key: int = None,
+    struct_var: str = None,
+) -> Tuple[int, int, int, str]:
+    offset = 0
+    size = 256
+
+    arrayType = ""
+    typeStrInternal = typeName.split("(")[1].split(")")[0].split("_")[1]
+
+    if typeStrInternal in ElementaryTypeName:
+        arrayType = "elementary"
+    if "array" in typeStrInternal:
+        arrayType = "array"
+    if "struct" in typeStrInternal:
+        arrayType = "struct"
+
+    if arrayType == "array":
+        typeStrInternalInternal = (
+            typeStrInternal.split("(")[1]
+            .split(")")[0]
+            .split("_")[1]
+            .split("(")[1]
+            .split(")")[0]
+            .split("_")[1]
+        )
+
+        assert typeStrInternalInternal in ElementaryTypeName
+
+        raise NotImplemented
 
 
 def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
@@ -48,10 +88,19 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
 
     typeType = ""
 
+    slot = int.to_bytes(int_slot, 32, byteorder="big")
+
+    # find topLevel type
     if type_to.split("_")[1] in ElementaryTypeName:
         typeType = "elementary"
-
-    slot = int.to_bytes(int_slot, 32, byteorder="big")
+    elif "array" in type_to.split("_")[1]:
+        typeType = "array"
+    elif "struct" in type_to.split("_")[1]:
+        typeType = "struct"
+    elif "mapping" in type_to.split("_")[1]:
+        typeType = "mapping"
+    else:
+        typeType = "unknown"
 
 
 if __name__ == "__main__":
