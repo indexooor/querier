@@ -1,6 +1,13 @@
 import json
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from utils.elementary_type_slither import ElementaryTypeName
+from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
+from typeParser import TypeParser
+from eth_utils import keccak
+
+
+class FetchObj:
+    def getSlotData() -> bytes:
+        pass
 
 
 def getStorageLayout(contractAddress: str) -> dict:
@@ -35,38 +42,50 @@ def getVariableInfo(
 
 
 def findArraySlot(
-    storageLayout: dict,
-    typeName: str,
+    typeTo: TypeParser,
+    slot: bytes,
     key: int,
-    deep_key: int = None,
-    struct_var: str = None,
+    deepKey: int = None,
+    structVar: str = None,
 ) -> Tuple[int, int, int, str]:
+    info = f"\nKey: {key}"
     offset = 0
     size = 256
 
-    arrayType = ""
-    typeStrInternal = typeName.split("(")[1].split(")")[0].split("_")[1]
+    targetVariableType = typeTo
 
-    if typeStrInternal in ElementaryTypeName:
-        arrayType = "elementary"
-    if "array" in typeStrInternal:
-        arrayType = "array"
-    if "struct" in typeStrInternal:
-        arrayType = "struct"
+    if targetVariableType.internal_type.type == "Array":
+        raise NotImplementedError
+    elif targetVariableType.size != None:
+        # Is a fixed size array
+        slotInt = int.from_bytes(slot, byteorder="big") + int(key)
 
-    if arrayType == "array":
-        typeStrInternalInternal = (
-            typeStrInternal.split("(")[1]
-            .split(")")[0]
-            .split("_")[1]
-            .split("(")[1]
-            .split(")")[0]
-            .split("_")[1]
-        )
+        if (
+            targetVariableType.internal_type.type == "Struct"
+            or targetVariableType.internal_type.type == "Array"
+        ):
+            raise NotImplementedError
+        else:
+            internalType = targetVariableType.internal_type.type
+            internalSlitherType = ElementaryType(internalType)
+            name = internalSlitherType.name
+            size = internalSlitherType.size
 
-        assert typeStrInternalInternal in ElementaryTypeName
+    elif targetVariableType.internal_type.type == "Struct":
+        raise NotImplementedError
+    else:
+        # is a dynamic array of elementary type
+        assert targetVariableType.internal_type.type in ElementaryTypeName
 
-        raise NotImplemented
+        slot = keccak(slot)
+        slotInt = int.from_bytes(slot, byteorder="big") + int(key)
+        internalSlitherType = ElementaryType(targetVariableType.type)
+        name = targetVariableType.type
+        size = internalSlitherType.size
+
+    slot = int.to_bytes(slotInt, 32, byteorder="big")
+
+    return info, name, slot, size, offset
 
 
 def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
@@ -74,33 +93,55 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
     storageLayout = getStorageLayout(contractAddress)
 
     key: Optional[int] = kwargs.get("key", None)
-    deep_key: Optional[int] = kwargs.get("deep_key", None)
-    struct_var: Optional[str] = kwargs.get("struct_var", None)
+    deepKey: Optional[int] = kwargs.get("deep_key", None)
+    structVar: Optional[str] = kwargs.get("struct_var", None)
 
-    var_log_name: str = targetVariable
+    varLogName: str = targetVariable
 
-    int_slot, size, offset, type_to, className = getVariableInfo(
-        storageLayout, var_log_name
+    intSlot, size, offset, typeStr, className = getVariableInfo(
+        storageLayout, varLogName
     )
 
-    if type_to == "" and className == "":
+    if typeStr == "" and className == "":
         raise "Error"
 
-    typeType = ""
+    typeTo = TypeParser(typeStr)
 
-    slot = int.to_bytes(int_slot, 32, byteorder="big")
+    slot = int.to_bytes(intSlot, 32, byteorder="big")
 
-    # find topLevel type
-    if type_to.split("_")[1] in ElementaryTypeName:
-        typeType = "elementary"
-    elif "array" in type_to.split("_")[1]:
-        typeType = "array"
-    elif "struct" in type_to.split("_")[1]:
-        typeType = "struct"
-    elif "mapping" in type_to.split("_")[1]:
-        typeType = "mapping"
+    if typeTo.type.split("_")[0] in ElementaryTypeName:
+        pass
+
+    elif typeTo.type.split("_")[0] == "Array":
+        info, name, slot, size, offset = findArraySlot(
+            typeTo, slot, key, deepKey, structVar
+        )
+
+    elif typeTo.type.split("_")[0] == "Struct":
+        raise NotImplementedError
+
+    elif typeTo.type.split("_")[0] == "Mapping":
+        raise NotImplementedError
+
     else:
-        typeType = "unknown"
+        raise NotImplementedError
+
+    intSlot = int.from_bytes(slot, byteorder="big")
+
+    return name, intSlot, size, offset
+
+
+def getSlotValue(
+    fetchObj: FetchObj,
+    name: str,
+    slot: int,
+    size: int,
+    offset: int,
+    value: Optional[Union[int, bool, str, ChecksumAddress]] = None,
+):
+
+    # get bytes at a slot
+    hex_bytes = fetchObj.getSlotData(slot)
 
 
 if __name__ == "__main__":
