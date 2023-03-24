@@ -4,7 +4,7 @@
 			"storage-layout": {
 				"storage": [
 					{
-						"astId": 197,
+						"astId": 233,
 						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
 						"label": "_balances",
 						"offset": 0,
@@ -12,7 +12,7 @@
 						"type": "t_mapping(t_address,t_uint256)"
 					},
 					{
-						"astId": 203,
+						"astId": 239,
 						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
 						"label": "_allowances",
 						"offset": 0,
@@ -20,7 +20,7 @@
 						"type": "t_mapping(t_address,t_mapping(t_address,t_uint256))"
 					},
 					{
-						"astId": 205,
+						"astId": 241,
 						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
 						"label": "_totalSupply",
 						"offset": 0,
@@ -28,7 +28,7 @@
 						"type": "t_uint256"
 					},
 					{
-						"astId": 207,
+						"astId": 243,
 						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
 						"label": "_name",
 						"offset": 0,
@@ -36,7 +36,7 @@
 						"type": "t_string_storage"
 					},
 					{
-						"astId": 209,
+						"astId": 245,
 						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
 						"label": "_symbol",
 						"offset": 0,
@@ -44,7 +44,7 @@
 						"type": "t_string_storage"
 					},
 					{
-						"astId": 76,
+						"astId": 112,
 						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
 						"label": "_owner",
 						"offset": 0,
@@ -66,14 +66,140 @@
 						"offset": 0,
 						"slot": "7",
 						"type": "t_mapping(t_uint256,t_struct(Hello)13_storage)"
+					},
+					{
+						"astId": 28,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "stringMapping",
+						"offset": 0,
+						"slot": "8",
+						"type": "t_mapping(t_string_memory_ptr,t_uint256)"
+					},
+					{
+						"astId": 31,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "owners",
+						"offset": 0,
+						"slot": "9",
+						"type": "t_array(t_address)dyn_storage"
+					},
+					{
+						"astId": 34,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "stringarrays",
+						"offset": 0,
+						"slot": "10",
+						"type": "t_array(t_string_storage)dyn_storage"
+					},
+					{
+						"astId": 38,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "arraysofarrays",
+						"offset": 0,
+						"slot": "11",
+						"type": "t_array(t_array(t_string_storage)dyn_storage)dyn_storage"
+					},
+					{
+						"astId": 42,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "addressaddress",
+						"offset": 0,
+						"slot": "12",
+						"type": "t_array(t_array(t_address)dyn_storage)dyn_storage"
+					},
+					{
+						"astId": 46,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "fixedArray",
+						"offset": 0,
+						"slot": "13",
+						"type": "t_array(t_address)10_storage"
+					},
+					{
+						"astId": 51,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "arrayOfArrayOfArrayOfUint256",
+						"offset": 0,
+						"slot": "23",
+						"type": "t_array(t_array(t_array(t_uint256)dyn_storage)dyn_storage)dyn_storage"
+					},
+					{
+						"astId": 55,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "arrayofStruct",
+						"offset": 0,
+						"slot": "24",
+						"type": "t_array(t_struct(Hello)13_storage)dyn_storage"
+					},
+					{
+						"astId": 60,
+						"contract": "/Users/kaush/AurtusCodes/pedalsup/Game-Planet/contracts/Mocks/MockERC20.sol:MockERC20",
+						"label": "arrayOfArrayOfStruct",
+						"offset": 0,
+						"slot": "25",
+						"type": "t_array(t_array(t_struct(Hello)13_storage)dyn_storage)dyn_storage"
 					}
 				],
 				"types": {
 					"t_address": { "encoding": "inplace", "label": "address", "numberOfBytes": "20" },
+					"t_array(t_address)10_storage": {
+						"base": "t_address",
+						"encoding": "inplace",
+						"label": "address[10]",
+						"numberOfBytes": "320"
+					},
+					"t_array(t_address)dyn_storage": {
+						"base": "t_address",
+						"encoding": "dynamic_array",
+						"label": "address[]",
+						"numberOfBytes": "32"
+					},
+					"t_array(t_array(t_address)dyn_storage)dyn_storage": {
+						"base": "t_array(t_address)dyn_storage",
+						"encoding": "dynamic_array",
+						"label": "address[][]",
+						"numberOfBytes": "32"
+					},
+					"t_array(t_array(t_array(t_uint256)dyn_storage)dyn_storage)dyn_storage": {
+						"base": "t_array(t_array(t_uint256)dyn_storage)dyn_storage",
+						"encoding": "dynamic_array",
+						"label": "uint256[][][]",
+						"numberOfBytes": "32"
+					},
+					"t_array(t_array(t_string_storage)dyn_storage)dyn_storage": {
+						"base": "t_array(t_string_storage)dyn_storage",
+						"encoding": "dynamic_array",
+						"label": "string[][]",
+						"numberOfBytes": "32"
+					},
+					"t_array(t_array(t_struct(Hello)13_storage)dyn_storage)dyn_storage": {
+						"base": "t_array(t_struct(Hello)13_storage)dyn_storage",
+						"encoding": "dynamic_array",
+						"label": "struct Hello[][]",
+						"numberOfBytes": "32"
+					},
+					"t_array(t_array(t_uint256)dyn_storage)dyn_storage": {
+						"base": "t_array(t_uint256)dyn_storage",
+						"encoding": "dynamic_array",
+						"label": "uint256[][]",
+						"numberOfBytes": "32"
+					},
 					"t_array(t_string_storage)dyn_storage": {
 						"base": "t_string_storage",
 						"encoding": "dynamic_array",
 						"label": "string[]",
+						"numberOfBytes": "32"
+					},
+					"t_array(t_struct(Hello)13_storage)dyn_storage": {
+						"base": "t_struct(Hello)13_storage",
+						"encoding": "dynamic_array",
+						"label": "struct Hello[]",
+						"numberOfBytes": "32"
+					},
+					"t_array(t_uint256)dyn_storage": {
+						"base": "t_uint256",
+						"encoding": "dynamic_array",
+						"label": "uint256[]",
 						"numberOfBytes": "32"
 					},
 					"t_mapping(t_address,t_mapping(t_address,t_uint256))": {
@@ -90,6 +216,13 @@
 						"numberOfBytes": "32",
 						"value": "t_uint256"
 					},
+					"t_mapping(t_string_memory_ptr,t_uint256)": {
+						"encoding": "mapping",
+						"key": "t_string_memory_ptr",
+						"label": "mapping(string => uint256)",
+						"numberOfBytes": "32",
+						"value": "t_uint256"
+					},
 					"t_mapping(t_uint256,t_struct(Hello)13_storage)": {
 						"encoding": "mapping",
 						"key": "t_uint256",
@@ -97,6 +230,7 @@
 						"numberOfBytes": "32",
 						"value": "t_struct(Hello)13_storage"
 					},
+					"t_string_memory_ptr": { "encoding": "bytes", "label": "string", "numberOfBytes": "32" },
 					"t_string_storage": { "encoding": "bytes", "label": "string", "numberOfBytes": "32" },
 					"t_struct(Hello)13_storage": {
 						"encoding": "inplace",
@@ -145,7 +279,7 @@
 			"storage-layout": {
 				"storage": [
 					{
-						"astId": 76,
+						"astId": 112,
 						"contract": "@openzeppelin/contracts/access/Ownable.sol:Ownable",
 						"label": "_owner",
 						"offset": 0,
@@ -160,7 +294,7 @@
 			"storage-layout": {
 				"storage": [
 					{
-						"astId": 197,
+						"astId": 233,
 						"contract": "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
 						"label": "_balances",
 						"offset": 0,
@@ -168,7 +302,7 @@
 						"type": "t_mapping(t_address,t_uint256)"
 					},
 					{
-						"astId": 203,
+						"astId": 239,
 						"contract": "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
 						"label": "_allowances",
 						"offset": 0,
@@ -176,7 +310,7 @@
 						"type": "t_mapping(t_address,t_mapping(t_address,t_uint256))"
 					},
 					{
-						"astId": 205,
+						"astId": 241,
 						"contract": "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
 						"label": "_totalSupply",
 						"offset": 0,
@@ -184,7 +318,7 @@
 						"type": "t_uint256"
 					},
 					{
-						"astId": 207,
+						"astId": 243,
 						"contract": "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
 						"label": "_name",
 						"offset": 0,
@@ -192,7 +326,7 @@
 						"type": "t_string_storage"
 					},
 					{
-						"astId": 209,
+						"astId": 245,
 						"contract": "@openzeppelin/contracts/token/ERC20/ERC20.sol:ERC20",
 						"label": "_symbol",
 						"offset": 0,
