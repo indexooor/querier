@@ -106,13 +106,13 @@ def findArraySlot(
 
         slot = keccak(slot)
         slotInt = int.from_bytes(slot, byteorder="big") + int(key)
-        internalSlitherType = ElementaryType(targetVariableType.type)
-        name = targetVariableType.type
+        internalSlitherType = ElementaryType(targetVariableType.internal_type.type)
+        name = targetVariableType.internal_type.type.split("_")[0]
         size = internalSlitherType.size
 
     slot = int.to_bytes(slotInt, 32, byteorder="big")
 
-    return info, name, slot, size, offset
+    return (info, name, slot, size, offset, name)
 
 
 def findMappingSlot(
@@ -217,7 +217,7 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
         finalType = typeTo.type.split("_")[0]
 
     elif typeTo.type.split("_")[0] == "Array":
-        info, name, slot, size, offset, finalType = findArraySlot(
+        _, _, slot, size, offset, finalType = findArraySlot(
             typeTo, slot, key, deepKey, structVar
         )
 
