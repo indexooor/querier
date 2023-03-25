@@ -1,6 +1,7 @@
 import json
+import db_connector 
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
+from elementary_type_slither import ElementaryTypeName, ElementaryType
 from typeParser import TypeParser
 from eth_utils import keccak
 
@@ -131,24 +132,34 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
     return name, intSlot, size, offset
 
 
-def getSlotValue(
-    fetchObj: FetchObj,
-    name: str,
-    slot: int,
-    size: int,
-    offset: int,
-    value: Optional[Union[int, bool, str, ChecksumAddress]] = None,
-):
+# def getSlotValue(
+#     fetchObj: FetchObj,
+#     name: str,
+#     slot: int,
+#     size: int,
+#     offset: int,
+#     value: Optional[Union[int, bool, str, ChecksumAddress]] = None,
+# ):
 
-    # get bytes at a slot
-    hex_bytes = fetchObj.getSlotData(slot)
+#     # cursor.execute("select * from ")
+#     # get bytes at a slot
+#     hex_bytes = fetchObj.getSlotData(slot)
+
+def temp():
+    connection = db_connector.db_connector()
+    print(connection)
+    cursor = connection.cursor()
+    cursor.execute("select * from indexooor where slot=%s;",("0xc0de027a52efca8d625712b39f648cf86940d46898ac8d8a2d323408c2b4cc51",))
+    data = cursor.fetchall()
+    print(data)
 
 
+    
 if __name__ == "__main__":
     # read  storage layout example as json
     with open("./files/0x1234567890123456789012345678901234567890.json") as json_file:
         storageLayout = json.load(json_file)
 
         print(storageLayout["primaryClass"])
-
+    temp()
     print("Hello World!")
