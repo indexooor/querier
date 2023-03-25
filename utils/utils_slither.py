@@ -15,18 +15,12 @@ class FetchObj:
     def getSlotData(self, slot: str) -> bytes:
         connection = db_connector()
 
-        print(connection)
-        print(hex(slot))
-
         # pad enough 0s to hex slot to make an eth address
 
         hexString = hex(slot)[2:]
         hexString = "0" * (64 - len(hexString)) + hexString
-        print(hexString)
 
         slot = "0x" + hexString
-
-        print(slot)
 
         cursor = connection.cursor()
         cursor.execute(
@@ -67,10 +61,9 @@ def getVariableInfo(
                 int_slot = int(var["slot"])
                 offset = int(var["offset"]) * 8
                 type_to = var["type"]
-                print(i["storage-layout"]["types"][type_to])
+                print(type_to)
                 size = int(i["storage-layout"]["types"][type_to]["numberOfBytes"]) * 8
                 className = h.split(":")[1]
-                print(int_slot, size, offset, type_to, className)
 
                 return int_slot, size, offset, type_to, className
 
@@ -139,14 +132,16 @@ def findMappingSlot(
 
     assert targetVariableType.key_type.type in ElementaryTypeName
 
-    key_type = targetVariableType.key_type.type.split("_")[1]
+    key_type = targetVariableType.key_type.type.split("_")[0]
 
     if "int" in key_type:
         key = int(key)
 
-    key = coerce_type(key, key_type)
+    key = coerce_type(key_type, key)
 
-    slot = keccak(encode([key_type, "uint256"], [key, decode("uint256", slot)]))
+    slot = keccak(encode([key_type, "uint256"], [key, decode(("uint256",), slot)[0]]))
+
+    print("Here ___ Bruh balances 2 ", targetVariableType)
 
     if targetVariableType.internal_type.type == "Struct":
         raise NotImplementedError
@@ -157,16 +152,23 @@ def findMappingSlot(
 
         assert targetVariableType.internal_type.key_type.type in ElementaryTypeName
 
-        key_type = targetVariableType.internal_type.key_type.type.split("_")[1]
+        print("HERE BRUH 2")
+
+        key_type = targetVariableType.internal_type.key_type.type.split("_")[0]
 
         if "int" in key_type:
             deepKey = int(deepKey)
 
+        deepKey = coerce_type(key_type, deepKey)
+
         slot = keccak(encode([key_type, "bytes32"], [deepKey, slot]))
 
-        typeTo = targetVariableType.internal_type.internal_type.type.split("_")[1]
+        typeTo = targetVariableType.internal_type.internal_type.type.split("_")[0]
 
         size = ElementaryType(typeTo).size
+
+        print("Here:", size)
+        print("Slot", slot)
 
         offset = 0
 
@@ -179,14 +181,22 @@ def findMappingSlot(
 
         return info, typeTo, slot, size, offset, typeTo
 
+    typeTo = targetVariableType.internal_type.type.split("_")[0]
+
+    size = ElementaryType(typeTo).size
+
+    offset = 0
+
+    return info, typeTo, slot, size, offset, typeTo
+
 
 def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
 
     storageLayout = getStorageLayout(contractAddress)
 
     key: Optional[int] = kwargs.get("key", None)
-    deepKey: Optional[int] = kwargs.get("deep_key", None)
-    structVar: Optional[str] = kwargs.get("struct_var", None)
+    deepKey: Optional[int] = kwargs.get("deepKey", None)
+    structVar: Optional[str] = kwargs.get("structVar", None)
 
     varLogName: str = targetVariable
 
@@ -246,7 +256,7 @@ def getSlotValue(
 
 def temp():
     connection = db_connector()
-    print(connection)
+
     cursor = connection.cursor()
     cursor.execute(
         "select * from indexooor where slot=%s && contract=%s",
@@ -256,7 +266,6 @@ def temp():
         ),
     )
     data = cursor.fetchall()
-    print(data)
 
 
 def convertValueToType(hexBytes: bytes, size: int, offset: int, typeStr: str):

@@ -1,10 +1,43 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
+from typing import Union, Optional
+
+
+class Querier(BaseModel):
+    contractAddress: str = Field(...)
+    targetVariable: str = Field(...)
+    key: Optional[Union[int, str]]
+    deepKey: Optional[Union[int, str]] = None
+    structVar: Optional[str] = None
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "contractAddress": "0x1234567890123456789012345678901234567890",
+                "targetVariable": "_balances",
+                "key": "0x1234567890123456789012345678901234567890",
+                "deepKey": "0x1234567890123456789012345678901234567890",
+                "structVar": "c",
+            }
+        }
+
+
+class QuerySlot(BaseModel):
+    contractAddress: str = Field(...)
+    slot: str = Field(...)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "contractAddress": "0xB0F3056D4f6F55cAA65610CF522DD3516E7D72BC",
+                "slot": "0x0000000000000000000000000000000000000000000000000000000000000003",
+            }
+        }
 
 
 class StorageLayoutAdd(BaseModel):
-    contractAddress: str
-    primaryClass: str
-    storageLayout: dict
+    contractAddress: str = Field(...)
+    primaryClass: str = Field(...)
+    storageLayout: dict = Field(...)
 
     class Config:
         schema_extra = {

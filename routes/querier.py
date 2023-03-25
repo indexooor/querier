@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
 import json
-from models.querier import StorageLayoutAdd
+from models.querier import StorageLayoutAdd, Querier
+from models.api import ResponseModel, ErrorResponseModel
 from utils.utils_slither import (
     getStorageLayout,
-    getVariableInfo,
     getStorageSlot,
     getSlotValue,
 )
@@ -14,13 +14,16 @@ router = APIRouter()
 # Pydantic typing is left for routes
 
 
-@router.get("/test")
+@router.get("/test", response_description="test route for querioor")
 async def test():
     return {"message": "Welcome to Indexooor Querier Rest API!"}
 
 
 # setStoageLayout end takes storage layout json as param and saves it as json on filesystem
-@router.post("/setStorageLayout")
+@router.post(
+    "/setStorageLayout",
+    response_description="Set storage layout for contract address for which querier will fetch and decode data",
+)
 async def setStorageLayout(
     storageLayout: StorageLayoutAdd = Body(...),
 ):
@@ -29,44 +32,59 @@ async def setStorageLayout(
         storageLayout.storageLayout["primaryClass"] = storageLayout.primaryClass
         json.dump(storageLayout.storageLayout, outfile)
 
-    return {"message": "Storage layout saved!"}
+    return ResponseModel(
+        data=storageLayout.storageLayout,
+        message="Storage layout added successfully!",
+    )
 
 
-@router.post("/getVariable")
+@router.post(
+    "/getVariable",
+    response_description="Get variable value from indexed slot database (decoding it using type from storage layout)",
+)
 async def getVariable(
-    contractAddress: str = Body(...),
-    variableName: str = Body(...),
+    data: Querier = Body(...),
 ):
     try:
-        # get storage layout for contract
-        storageLayout = getStorageLayout(contractAddress)
-
         # get storage slot
         name, slot, size, offset, typeStr = getStorageSlot(
-            contractAddress, variableName
+            data.contractAddress,
+            data.targetVariable,
+            key=data.key,
+            deepKey=data.deepKey,
+            structVar=data.structVar,
         )
 
         # get slot value
         slotValue = getSlotValue(
-            contractAddress=contractAddress,
+            contractAddress=data.contractAddress,
             slot=slot,
             offset=offset,
             size=size,
             typeStr=typeStr,
         )
 
-        return {
-            "message": "Variable value fetched!",
-            "variableName": variableName,
-            "variableValue": slotValue,
-            "variableType": typeStr,
-        }
+        return ResponseModel(
+            data={
+                "variableName": data.targetVariable,
+                "variableValue": slotValue,
+                "variableType": typeStr,
+            },
+            message="Variable fetched successfully!",
+        )
     except Exception as e:
         raise e
-        return {"message": "Error: " + str(e)}
+
+        return ErrorResponseModel(
+            error=str(e),
+            code=500,
+            message="An error occurred",
+        )
 
 
-@router.post("/getSlot")
+@router.post(
+    "/getSlot", response_description="Get slot value from indexed slot database"
+)
 async def getSlot(
     contractAddress: str = Body(...),
     variableName: str = Body(...),

@@ -8,7 +8,7 @@ class TypeParser:
 
         self.type_re = re.compile(r"^t_(\w+)")
         self.array_re = re.compile(r"^t_array\((.+)\)(\d*_storage)?")
-        self.mapping_re = re.compile(r"^t_mapping\((.+),(.+)\)")
+        self.mapping_re = re.compile(r"^t_mapping\((.+?),(.+)\)$")
         self.struct_re = re.compile(r"^t_struct\((\w+)\)(\d*_storage)?")
         self.storage_re = re.compile(r".*_(storage)")
 
@@ -48,6 +48,7 @@ class TypeParser:
                 self.key_type = match.group(1)
                 self.key_type = TypeParser(self.key_type)
                 self.internal_type = match.group(2)
+                print("Internal type", self.internal_type)
                 self.internal_type = TypeParser(self.internal_type)
             else:
                 match = self.struct_re.match(self.type_string)
@@ -84,29 +85,29 @@ class TypeParser:
 if __name__ == "__main__":
 
     # read storage layout file
-    with open("storageLayout.Example.json") as f:
-        storageLayout = json.load(f)
-        for key, value in storageLayout["contracts"].items():
-            try:
-                for k, v in value["storage-layout"]["types"].items():
-                    print(k)
+    # with open("storageLayout.Example.json") as f:
+    #     storageLayout = json.load(f)
+    #     for key, value in storageLayout["contracts"].items():
+    #         try:
+    #             for k, v in value["storage-layout"]["types"].items():
+    #                 print(k)
 
-                    t = TypeParser(k)
-                    print(t)
+    #                 t = TypeParser(k)
+    #                 print(t)
 
-                    print(t.storage)
-                    print(t.size)
-            except Exception as e:
-                print(e)
+    #                 print(t.storage)
+    #                 print(t.size)
+    #         except Exception as e:
+    #             print(e)
 
-    t = TypeParser("t_mapping(t_string_memory_ptr,t_uint256)")
+    # t = TypeParser("t_mapping(t_string_memory_ptr,t_uint256)")
 
-    print(t)
-    print(t.internal_type)
-    print(t.storage)
-    print(t.key_type)
+    # print(t)
+    # print(t.internal_type)
+    # print(t.storage)
+    # print(t.key_type)
 
-    t = TypeParser("t_array(t_address)10_storage")
+    t = TypeParser("t_mapping(t_address,t_mapping(t_address,t_uint256))")
 
     print(t)
     print(t.internal_type)
