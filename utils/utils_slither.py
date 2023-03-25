@@ -134,6 +134,7 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
 
 def getSlotValue(
     fetchObj: FetchObj,
+    contrctAddress: str,
     name: str,
     slot: int,
     size: int,
