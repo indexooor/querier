@@ -5,6 +5,7 @@ from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
 from utils.typeParser import TypeParser
 from eth_utils import keccak
 from eth_utils import to_checksum_address, to_int, to_text, to_bytes
+from eth_abi import decode, encode
 
 
 class FetchObj:
@@ -121,6 +122,64 @@ def findArraySlot(
     return info, name, slot, size, offset
 
 
+def findMappingSlot(
+    targetVariableType: TypeParser,
+    slot: bytes,
+    key: Union[int, str],
+    deepKey: Union[int, str] = None,
+    structVar: str = None,
+):
+    info = f"\nKey: {key}"
+    offset = 0
+
+    if key:
+        info += f"\nKey: {key}"
+    if deepKey:
+        info += f"\nDeep Key: {deepKey}"
+
+    assert targetVariableType.key_type.type in ElementaryTypeName
+
+    key_type = targetVariableType.key_type.type.split("_")[1]
+
+    if "int" in key_type:
+        key = int(key)
+
+    key = coerce_type(key, key_type)
+
+    slot = keccak(encode([key_type, "uint256"], [key, decode("uint256", slot)]))
+
+    if targetVariableType.internal_type.type == "Struct":
+        raise NotImplementedError
+
+    elif targetVariableType.internal_type.type == "Mapping":
+
+        assert deepKey
+
+        assert targetVariableType.internal_type.key_type.type in ElementaryTypeName
+
+        key_type = targetVariableType.internal_type.key_type.type.split("_")[1]
+
+        if "int" in key_type:
+            deepKey = int(deepKey)
+
+        slot = keccak(encode([key_type, "bytes32"], [deepKey, slot]))
+
+        typeTo = targetVariableType.internal_type.internal_type.type.split("_")[1]
+
+        size = ElementaryType(typeTo).size
+
+        offset = 0
+
+        if targetVariableType.internal_type.internal_type.type == "Struct":
+            raise NotImplementedError
+        elif targetVariableType.internal_type.internal_type.type in ElementaryTypeName:
+            pass
+        else:
+            raise NotImplementedError
+
+        return info, typeTo, slot, size, offset, typeTo
+
+
 def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
 
     storageLayout = getStorageLayout(contractAddress)
@@ -156,7 +215,9 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
         raise NotImplementedError
 
     elif typeTo.type.split("_")[0] == "Mapping":
-        raise NotImplementedError
+        _, _, slot, size, offset, finalType = findMappingSlot(
+            typeTo, slot, key, deepKey, structVar
+        )
 
     else:
         raise NotImplementedError
