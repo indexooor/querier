@@ -3,6 +3,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
 from typeParser import TypeParser
 from eth_utils import keccak
+from eth_utils import to_checksum_address, to_int, to_text
 
 
 class FetchObj:
@@ -137,11 +138,74 @@ def getSlotValue(
     slot: int,
     size: int,
     offset: int,
-    value: Optional[Union[int, bool, str, ChecksumAddress]] = None,
+    value: Optional[Union[int, bool, str]] = None,
 ):
 
     # get bytes at a slot
     hex_bytes = fetchObj.getSlotData(slot)
+
+
+def convertValueToType(hexBytes: bytes, size: int, offset: int, typeStr: str):
+
+    offsetHexBytes = getOffsetValue(hexBytes, offset, size)
+
+    try:
+        value = coerce_type(typeStr, offsetHexBytes)
+    except ValueError:
+        return coerce_type("int256", offsetHexBytes)
+
+    return value
+
+
+def getOffsetValue(hex_bytes: bytes, offset: int, size: int) -> bytes:
+    """
+    Trims slot data to only contain the target variable's.
+    Args:
+        hex_bytes (HexBytes): String representation of type
+        offset (int): The size (in bits) of other variables that share the same slot.
+        size (int): The size (in bits) of the target variable.
+    Returns:
+        (bytes): The target variable's trimmed data.
+    """
+    size = int(size / 8)
+    offset = int(offset / 8)
+    if offset == 0:
+        value = hex_bytes[-size:]
+    else:
+        start = size + offset
+        value = hex_bytes[-start:-offset]
+    return value
+
+
+def coerce_type(
+    solidity_type: str, value: Union[int, str, bytes]
+) -> Union[int, bool, str]:
+    """
+    Converts input to the indicated type.
+    Args:
+        solidity_type (str): String representation of type.
+        value (bytes): The value to be converted.
+    Returns:
+        (Union[int, bool, str, ChecksumAddress, hex]): The type representation of the value.
+    """
+    if "int" in solidity_type:
+        return to_int(value)
+    if "bool" in solidity_type:
+        return bool(to_int(value))
+    if "string" in solidity_type and isinstance(value, bytes):
+        # length * 2 is stored in lower end bits
+        # TODO handle bytes and strings greater than 32 bytes
+        length = int(int.from_bytes(value[-2:], "big") / 2)
+        return to_text(value[:length])
+
+    if "address" in solidity_type:
+        if not isinstance(value, (str, bytes)):
+            raise TypeError
+        return to_checksum_address(value)
+
+    if not isinstance(value, bytes):
+        raise TypeError
+    return value.hex()
 
 
 if __name__ == "__main__":
