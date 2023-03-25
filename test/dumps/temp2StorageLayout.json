@@ -1,0 +1,87 @@
+{
+	"contracts": {
+		"test/exampleContracts/Temp2.sol:Temp2": {
+			"storage-layout": {
+				"storage": [
+					{
+						"astId": 3,
+						"contract": "test/exampleContracts/Temp2.sol:Temp2",
+						"label": "val1",
+						"offset": 0,
+						"slot": "0",
+						"type": "t_uint256"
+					},
+					{
+						"astId": 5,
+						"contract": "test/exampleContracts/Temp2.sol:Temp2",
+						"label": "bool1",
+						"offset": 0,
+						"slot": "1",
+						"type": "t_bool"
+					},
+					{
+						"astId": 7,
+						"contract": "test/exampleContracts/Temp2.sol:Temp2",
+						"label": "str1",
+						"offset": 0,
+						"slot": "2",
+						"type": "t_string_storage"
+					},
+					{
+						"astId": 11,
+						"contract": "test/exampleContracts/Temp2.sol:Temp2",
+						"label": "balances",
+						"offset": 0,
+						"slot": "3",
+						"type": "t_mapping(t_address,t_uint256)"
+					},
+					{
+						"astId": 19,
+						"contract": "test/exampleContracts/Temp2.sol:Temp2",
+						"label": "temp",
+						"offset": 0,
+						"slot": "4",
+						"type": "t_struct(Temp)16_storage"
+					}
+				],
+				"types": {
+					"t_address": { "encoding": "inplace", "label": "address", "numberOfBytes": "20" },
+					"t_bool": { "encoding": "inplace", "label": "bool", "numberOfBytes": "1" },
+					"t_mapping(t_address,t_uint256)": {
+						"encoding": "mapping",
+						"key": "t_address",
+						"label": "mapping(address => uint256)",
+						"numberOfBytes": "32",
+						"value": "t_uint256"
+					},
+					"t_string_storage": { "encoding": "bytes", "label": "string", "numberOfBytes": "32" },
+					"t_struct(Temp)16_storage": {
+						"encoding": "inplace",
+						"label": "struct Temp2.Temp",
+						"members": [
+							{
+								"astId": 13,
+								"contract": "test/exampleContracts/Temp2.sol:Temp2",
+								"label": "name",
+								"offset": 0,
+								"slot": "0",
+								"type": "t_string_storage"
+							},
+							{
+								"astId": 15,
+								"contract": "test/exampleContracts/Temp2.sol:Temp2",
+								"label": "val",
+								"offset": 0,
+								"slot": "1",
+								"type": "t_uint256"
+							}
+						],
+						"numberOfBytes": "64"
+					},
+					"t_uint256": { "encoding": "inplace", "label": "uint256", "numberOfBytes": "32" }
+				}
+			}
+		}
+	},
+	"version": "0.8.17+commit.8df45f5f.Windows.msvc"
+}

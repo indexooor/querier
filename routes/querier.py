@@ -41,25 +41,28 @@ async def getVariable(
         # get storage layout for contract
         storageLayout = getStorageLayout(contractAddress)
 
-        # get variable info from storage layout
-        int_slot, size, offset, type_to, className = getVariableInfo(
-            storageLayout, variableName
+        # get storage slot
+        name, slot, size, offset, typeStr = getStorageSlot(
+            contractAddress, variableName
         )
 
-        # get storage slot
-        slot = getStorageSlot(contractAddress, int_slot)
-
         # get slot value
-        slotValue = getSlotValue(slot, offset, size)
+        slotValue = getSlotValue(
+            contractAddress=contractAddress,
+            slot=slot,
+            offset=offset,
+            size=size,
+            typeStr=typeStr,
+        )
 
         return {
             "message": "Variable value fetched!",
             "variableName": variableName,
             "variableValue": slotValue,
-            "variableType": type_to,
-            "className": className,
+            "variableType": typeStr,
         }
     except Exception as e:
+        raise e
         return {"message": "Error: " + str(e)}
 
 

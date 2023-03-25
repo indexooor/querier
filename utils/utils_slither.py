@@ -1,5 +1,5 @@
 import json
-import db_connector
+from utils.db_connector import db_connector
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
 from utils.typeParser import TypeParser
@@ -8,8 +8,37 @@ from eth_utils import to_checksum_address, to_int, to_text
 
 
 class FetchObj:
-    def getSlotData() -> bytes:
-        pass
+    def __init__(self, contractAddress: str):
+        self.contractAddress = contractAddress
+
+    def getSlotData(self, slot: str) -> bytes:
+        connection = db_connector()
+
+        print(connection)
+        print(hex(slot))
+
+        # pad enough 0s to hex slot to make an eth address
+
+        hexString = hex(slot)[2:]
+        hexString = "0" * (64 - len(hexString)) + hexString
+        print(hexString)
+
+        slot = "0x" + hexString
+
+        print(slot)
+
+        cursor = connection.cursor()
+        cursor.execute(
+            "select * from indexooor where slot='{}' and contract='{}'".format(
+                slot, self.contractAddress
+            )
+        )
+        data = cursor.fetchall()
+
+        if len(data) == 0:
+            return None
+
+        return data[0][2]
 
 
 def getStorageLayout(contractAddress: str) -> dict:
@@ -28,6 +57,7 @@ def getTopLevelType(type_to: str) -> str:
 def getVariableInfo(
     storageLayout: dict, var_log_name: str
 ) -> Tuple[int, int, int, str]:
+
     for h, i in storageLayout["contracts"].items():
         layout = i["storage-layout"]["storage"]
 
@@ -36,11 +66,12 @@ def getVariableInfo(
                 int_slot = int(var["slot"])
                 offset = int(var["offset"]) * 8
                 type_to = var["type"]
-                size = i["storage-layout"]["types"][type_to]["size"] * 8
+                print(i["storage-layout"]["types"][type_to])
+                size = int(i["storage-layout"]["types"][type_to]["numberOfBytes"]) * 8
                 className = h.split(":")[1]
-                return int_slot, size, offset, type_to, className
+                print(int_slot, size, offset, type_to, className)
 
-    return 0, 0, 0, "", ""
+                return int_slot, size, offset, type_to, className
 
 
 def findArraySlot(
@@ -100,22 +131,24 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
 
     varLogName: str = targetVariable
 
-    intSlot, size, offset, typeStr, className = getVariableInfo(
-        storageLayout, varLogName
-    )
+    finalType = None
 
-    if typeStr == "" and className == "":
-        raise "Error"
+    try:
+        intSlot, size, offset, typeStr, className = getVariableInfo(
+            storageLayout, varLogName
+        )
+    except Exception as e:
+        raise ValueError("Variable not found")
 
     typeTo = TypeParser(typeStr)
 
     slot = int.to_bytes(intSlot, 32, byteorder="big")
 
     if typeTo.type.split("_")[0] in ElementaryTypeName:
-        pass
+        finalType = typeTo.type.split("_")[0]
 
     elif typeTo.type.split("_")[0] == "Array":
-        info, name, slot, size, offset = findArraySlot(
+        info, name, slot, size, offset, finalType = findArraySlot(
             typeTo, slot, key, deepKey, structVar
         )
 
@@ -130,31 +163,36 @@ def getStorageSlot(contractAddress: str, targetVariable: str, **kwargs: Any):
 
     intSlot = int.from_bytes(slot, byteorder="big")
 
-    return name, intSlot, size, offset
+    return varLogName, intSlot, size, offset, finalType
 
 
 def getSlotValue(
-    fetchObj: FetchObj,
-    contrctAddress: str,
-    name: str,
+    contractAddress: str,
+    typeStr: str,
     slot: int,
     size: int,
     offset: int,
     value: Optional[Union[int, bool, str]] = None,
 ):
-
-    #     # cursor.execute("select * from ")
+    fetchObj = FetchObj(contractAddress)
     #     # get bytes at a slot
     hex_bytes = fetchObj.getSlotData(slot)
 
+    data = convertValueToType(hex_bytes, size, offset, typeStr)
+
+    return data
+
 
 def temp():
-    connection = db_connector.db_connector()
+    connection = db_connector()
     print(connection)
     cursor = connection.cursor()
     cursor.execute(
-        "select * from indexooor where slot=%s;",
-        ("0xc0de027a52efca8d625712b39f648cf86940d46898ac8d8a2d323408c2b4cc51",),
+        "select * from indexooor where slot=%s && contract=%s",
+        (
+            "0xc0de027a52efca8d625712b39f648cf86940d46898ac8d8a2d323408c2b4cc51",
+            "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419",
+        ),
     )
     data = cursor.fetchall()
     print(data)
@@ -204,14 +242,14 @@ def coerce_type(
         (Union[int, bool, str, ChecksumAddress, hex]): The type representation of the value.
     """
     if "int" in solidity_type:
-        return to_int(value)
+        return to_int(hexstr=value)
     if "bool" in solidity_type:
-        return bool(to_int(value))
+        return bool(to_int(hexstr=value))
     if "string" in solidity_type and isinstance(value, bytes):
         # length * 2 is stored in lower end bits
         # TODO handle bytes and strings greater than 32 bytes
         length = int(int.from_bytes(value[-2:], "big") / 2)
-        return to_text(value[:length])
+        return to_text(hexstr=value[:length])
 
     if "address" in solidity_type:
         if not isinstance(value, (str, bytes)):
