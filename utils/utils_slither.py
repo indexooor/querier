@@ -1,4 +1,5 @@
 import json
+import db_connector
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
 from utils.typeParser import TypeParser
@@ -142,8 +143,21 @@ def getSlotValue(
     value: Optional[Union[int, bool, str]] = None,
 ):
 
-    # get bytes at a slot
+    #     # cursor.execute("select * from ")
+    #     # get bytes at a slot
     hex_bytes = fetchObj.getSlotData(slot)
+
+
+def temp():
+    connection = db_connector.db_connector()
+    print(connection)
+    cursor = connection.cursor()
+    cursor.execute(
+        "select * from indexooor where slot=%s;",
+        ("0xc0de027a52efca8d625712b39f648cf86940d46898ac8d8a2d323408c2b4cc51",),
+    )
+    data = cursor.fetchall()
+    print(data)
 
 
 def convertValueToType(hexBytes: bytes, size: int, offset: int, typeStr: str):
@@ -215,5 +229,5 @@ if __name__ == "__main__":
         storageLayout = json.load(json_file)
 
         print(storageLayout["primaryClass"])
-
+    temp()
     print("Hello World!")
