@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
 from utils.typeParser import TypeParser
 from eth_utils import keccak
-from eth_utils import to_checksum_address, to_int, to_text
+from eth_utils import to_checksum_address, to_int, to_text, to_bytes
 
 
 class FetchObj:
@@ -38,7 +38,7 @@ class FetchObj:
         if len(data) == 0:
             return None
 
-        return data[0][2]
+        return bytes.fromhex(data[0][2].split("x")[1])
 
 
 def getStorageLayout(contractAddress: str) -> dict:
@@ -241,15 +241,16 @@ def coerce_type(
     Returns:
         (Union[int, bool, str, ChecksumAddress, hex]): The type representation of the value.
     """
+
     if "int" in solidity_type:
-        return to_int(hexstr=value)
+        return to_int(value)
     if "bool" in solidity_type:
-        return bool(to_int(hexstr=value))
+        return bool(to_int(value))
     if "string" in solidity_type and isinstance(value, bytes):
         # length * 2 is stored in lower end bits
         # TODO handle bytes and strings greater than 32 bytes
         length = int(int.from_bytes(value[-2:], "big") / 2)
-        return to_text(hexstr=value[:length])
+        return to_text(value[:length])
 
     if "address" in solidity_type:
         if not isinstance(value, (str, bytes)):
