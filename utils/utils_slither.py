@@ -1,7 +1,7 @@
 import json
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
-from typeParser import TypeParser
+from utils.typeParser import TypeParser
 from eth_utils import keccak
 from eth_utils import to_checksum_address, to_int, to_text
 
