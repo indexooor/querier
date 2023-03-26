@@ -18,6 +18,5 @@ def db_connector():
 
     # # Fetch a single row using fetchone() method.
     # data = cursor.fetchall()
-    # print("Connection established to: ",data)
     return conn
     # Closing the connection

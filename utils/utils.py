@@ -77,7 +77,6 @@ def getVariableInfo(
                 int_slot = int(var["slot"])
                 offset = int(var["offset"]) * 8
                 type_to = var["type"]
-                print(type_to)
                 size = int(i["storage-layout"]["types"][type_to]["numberOfBytes"]) * 8
                 className = h.split(":")[1]
 
@@ -157,8 +156,6 @@ def findMappingSlot(
 
     slot = keccak(encode([key_type, "uint256"], [key, decode(("uint256",), slot)[0]]))
 
-    print("Here ___ Bruh balances 2 ", targetVariableType)
-
     if targetVariableType.internal_type.type == "Struct":
         raise NotImplementedError
 
@@ -167,8 +164,6 @@ def findMappingSlot(
         assert deepKey
 
         assert targetVariableType.internal_type.key_type.type in ElementaryTypeName
-
-        print("HERE BRUH 2")
 
         key_type = targetVariableType.internal_type.key_type.type.split("_")[0]
 
@@ -182,9 +177,6 @@ def findMappingSlot(
         typeTo = targetVariableType.internal_type.internal_type.type.split("_")[0]
 
         size = ElementaryType(typeTo).size
-
-        print("Here:", size)
-        print("Slot", slot)
 
         offset = 0
 
