@@ -17,7 +17,7 @@ app.add_middleware(
 )
 
 
-app.include_router(QuerierRouter, tags=["Queriooor"], prefix="/querioor")
+app.include_router(QuerierRouter, tags=["Queriooor"], prefix="/queriooor")
 
 
 @app.get("/", tags=["Root"])

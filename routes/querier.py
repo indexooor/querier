@@ -11,7 +11,7 @@ router = APIRouter()
 # Pydantic typing is left for routes
 
 
-@router.get("/test", response_description="test route for querioor")
+@router.get("/test", response_description="test route for queriooor")
 async def test():
     return {"message": "Welcome to Indexooor Querier Rest API!"}
 
@@ -59,6 +59,16 @@ async def get_variable(
             offset=offset,
             size=size,
             typeStr=typeStr,
+        )
+
+        saveObj = FetchObj(data.contractAddress)
+        # change the key thing here, as this may lead to bugs when user adds key to body for variables without key
+        saveObj.addVariableName(
+            slot,
+            data.targetVariable,
+            key=data.key,  # buggy, find datatype and store key if data type should have key
+            deepKey=data.deepKey,  # buggy, find datatype and store deep key if data type should have deep key
+            structVar=data.structVar,  # buggy, find datatype and store structVar if data type should have structVar
         )
 
         return ResponseModel(

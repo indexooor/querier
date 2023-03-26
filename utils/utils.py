@@ -51,6 +51,29 @@ class FetchObj:
 
         return data[0][2].split("x")[1]
 
+    def addVariableName(
+        self,
+        slot: str,
+        name: str,
+        key: str = "",
+        deepKey: str = "",
+        structVar: str = "",
+    ) -> None:
+        connection = db_connector()
+
+        hexString = hex(slot)[2:]
+        hexString = "0" * (64 - len(hexString)) + hexString
+
+        slot = "0x" + hexString
+
+        cursor = connection.cursor()
+        cursor.execute(
+            "update indexooor set variable_name='{}', key='{}', deep_key='{}', struct_var='{}' where slot='{}' and contract='{}'".format(
+                name, key, deepKey, structVar, slot, self.contractAddress
+            )
+        )
+        connection.commit()
+
 
 def getStorageLayout(contractAddress: str) -> dict:
     # read  storage layout example as json
