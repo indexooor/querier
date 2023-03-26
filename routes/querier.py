@@ -1,13 +1,10 @@
 from fastapi import APIRouter, Body
 from fastapi.encoders import jsonable_encoder
 import json
-from models.querier import StorageLayoutAdd, Querier
+from models.querier import StorageLayoutAdd, Querier, QuerySlot
 from models.api import ResponseModel, ErrorResponseModel
-from utils.utils_slither import (
-    getStorageLayout,
-    getStorageSlot,
-    getSlotValue,
-)
+from utils.utils import getStorageSlot, getSlotValue, FetchObj
+
 
 router = APIRouter()
 
@@ -73,7 +70,7 @@ async def getVariable(
             message="Variable fetched successfully!",
         )
     except Exception as e:
-        raise e
+        # raise e
 
         return ErrorResponseModel(
             error=str(e),
@@ -86,10 +83,27 @@ async def getVariable(
     "/getSlot", response_description="Get slot value from indexed slot database"
 )
 async def getSlot(
-    contractAddress: str = Body(...),
-    variableName: str = Body(...),
+    data: QuerySlot = Body(...),
 ):
+    try:
+        # Directly fetch slot value from storage slot and return
 
-    # Directly fetch slot value from storage slot and return
+        slot = data.slot
 
-    return  # TODO
+        fetch = FetchObj(data.contractAddress)
+
+        fetchedData = fetch.getDirectSlotData(slot)
+
+        return ResponseModel(
+            data={slot: fetchedData},
+            message="Slot fetched successfully!",
+        )
+
+    except Exception as e:
+        # raise e
+
+        return ErrorResponseModel(
+            error=str(e),
+            code=500,
+            message="An error occurred",
+        )

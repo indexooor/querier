@@ -1,7 +1,7 @@
 import json
 from utils.db_connector import db_connector
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
-from utils.elementary_type_slither import ElementaryTypeName, ElementaryType
+from utils.elementary_type import ElementaryTypeName, ElementaryType
 from utils.typeParser import TypeParser
 from eth_utils import keccak
 from eth_utils import to_checksum_address, to_int, to_text, to_bytes
@@ -34,6 +34,22 @@ class FetchObj:
             return None
 
         return bytes.fromhex(data[0][2].split("x")[1])
+
+    def getDirectSlotData(self, slot: str) -> bytes:
+        connection = db_connector()
+
+        cursor = connection.cursor()
+        cursor.execute(
+            "select * from indexooor where slot='{}' and contract='{}'".format(
+                slot, self.contractAddress
+            )
+        )
+        data = cursor.fetchall()
+
+        if len(data) == 0:
+            return None
+
+        return data[0][2].split("x")[1]
 
 
 def getStorageLayout(contractAddress: str) -> dict:

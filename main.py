@@ -17,9 +17,9 @@ app.add_middleware(
 )
 
 
-app.include_router(QuerierRouter, tags=["Querier"], prefix="/querier")
+app.include_router(QuerierRouter, tags=["Queriooor"], prefix="/querioor")
 
 
 @app.get("/", tags=["Root"])
 async def read_root():
-    return {"message": "Welcome to Indexooor Querier Rest API!"}
+    return {"message": "Welcome to Indexooor Queriooor Rest API!"}
