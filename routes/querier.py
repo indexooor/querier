@@ -21,7 +21,7 @@ async def test():
     "/setStorageLayout",
     response_description="Set storage layout for contract address for which querier will fetch and decode data",
 )
-async def setStorageLayout(
+async def set_storage_layout(
     storageLayout: StorageLayoutAdd = Body(...),
 ):
     # save dictionary as json file with name contractAddress
@@ -39,7 +39,7 @@ async def setStorageLayout(
     "/getVariable",
     response_description="Get variable value from indexed slot database (decoding it using type from storage layout)",
 )
-async def getVariable(
+async def get_variable(
     data: Querier = Body(...),
 ):
     try:
@@ -80,9 +80,10 @@ async def getVariable(
 
 
 @router.post(
-    "/getSlot", response_description="Get slot value from indexed slot database"
+    "/getSlot",
+    response_description="Get slot value from indexed slot database",
 )
-async def getSlot(
+async def get_slot(
     data: QuerySlot = Body(...),
 ):
     try:
